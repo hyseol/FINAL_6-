@@ -1,0 +1,36 @@
+https://colab.research.google.com/drive/1tXIKHy_dV6FYpPtMjNQgVBOp3HFQ46VK#scrollTo=E9PSK5LDD6mn
+
+# '대분류_수정_평균구매가격'을 기준으로 금액대를 설정
+price_bins = [0, 50000, 100000, 200000, 500000, 1000000, data['대분류_수정_평균구매가격'].max()]
+price_labels = ['0-50k', '50k-100k', '100k-200k', '200k-500k', '500k-1M', '1M+']
+
+# 위의 금액대를 기준으로 '금액대' 컬럼 생성
+data['금액대'] = pd.cut(data['대분류_수정_평균구매가격'], bins=price_bins, labels=price_labels)
+
+# 각 금액대별 평균 구매 주기('구매주기') 계산
+avg_purchase_cycle_by_price_band = data.groupby('금액대')['구매주기'].mean().reset_index()
+avg_purchase_cycle_by_price_band.rename(columns={'구매주기': '금액대별_평균_구매주기'}, inplace=True)
+
+# 결과 DataFrame 출력
+avg_purchase_cycle_by_price_band
+
+
+--------------------시각화-------------------------
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# 그래프 스타일 설정
+plt.figure(figsize=(10, 6))
+sns.set_theme(style="whitegrid")
+
+# 금액대별 평균 구매 주기를 나타내는 바 그래프 생성
+sns.barplot(data=avg_purchase_cycle_by_price_band, x='금액대', y='금액대별_평균_구매주기', palette="Blues_d")
+
+# 그래프 제목과 축 레이블 설정
+plt.title("금액대별 평균 구매 주기", fontsize=16)
+plt.xlabel("금액대", fontsize=12)
+plt.ylabel("평균 구매 주기 (일)", fontsize=12)
+
+# 그래프 표시
+plt.show()
